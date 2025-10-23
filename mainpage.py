@@ -4,11 +4,10 @@ from ttkbootstrap.constants import *
 import json
 import subprocess
 from PIL import Image, ImageTk
-
+from ttkwidgets import CheckboxTreeview
+import sys
 estado_das_checkboxes = {}
 # Carregar imagens de checkbox
-
-
 
 def carregar_produtos():
     arquivo_produtos = open('produtos.json', 'r', encoding='utf-8')
@@ -50,26 +49,9 @@ def tabela_produtos():
       if busca in produto['nome'].lower():
         item_id = treeview.insert(
             '', 'end', 
-            values=(produto['nome'], id, produto['preco'], produto['quantidade'], produto['val'], produto['fab'], produto['peso']), # As colunas da treeview para o programa
-            image=imagem_unchecado  # Imagenzinha bonitinha para meu checkbox kkkkkkkk
+            values=(produto['nome'], id, produto['preco'], produto['quantidade'], produto['val'], produto['fab'], produto['peso'])
         )
-        treeview.item(item_id, image=imagem_unchecado)
         estado_das_checkboxes[item_id] = False
-
-
-def alternar_checkbox(event):
-    region = treeview.identify_region(event.x, event.y)
-    column = treeview.identify_column(event.x)
-    
-    if region == "tree" or column == "#1":  # "#1" é a coluna 'Selecionar'
-        item_id = treeview.identify_row(event.y)
-        if item_id:
-            estado_atual = estado_das_checkboxes.get(item_id, False)
-            novo_estado = not estado_atual
-            estado_das_checkboxes[item_id] = novo_estado
-            imagem = imagem_checado if novo_estado else imagem_unchecado
-            treeview.item(item_id, image=imagem)
-
 
 def mostrar_detalhes_do_produto():
     busca = entrada_busca.get().lower()
@@ -117,14 +99,20 @@ def mostrar_detalhes_do_produto():
     mostrar_popup()
 
 def itens_selecionados():
-    selecionados = []
-    for item_id, checado in estado_das_checkboxes.items():
-        if checado:
-            selecionados.append(item_id)
-    return selecionados
+    
+    """if (variavel1.get() == 1) & (variavel2.get() == 0):
+        label.config(text='I love Python ')
+    elif (variavel1.get() == 0) & (variavel2.get() == 1):
+        label.config(text='I love C++')
+    elif (variavel1.get() == 0) & (variavel2.get() == 0):
+        label.config(text='I do not anything')
+    else:
+        label.config(text='I love both')"""
+        
+ 
 
 def alterar_produto():
-    selecionados = [item_id for item_id, marcado in estado_das_checkboxes.items() if marcado] # Procura o item marcado na checkbox
+    selecionados = treeview.get_checked() # Procura o item marcado na checkbox
     
     if len(selecionados) == 0:
         mostrar_popup("Nenhum produto selecionado!")
@@ -142,7 +130,7 @@ def alterar_produto():
     
 def confirmar_delete():
     # Recuperar o item selecionado
-    selecionados = [item_id for item_id, marcado in estado_das_checkboxes.items() if marcado]
+    selecionados = treeview.get_checked()
     
     if len(selecionados) == 0:
         mostrar_popup("Nenhum produto selecionado!")
@@ -178,7 +166,7 @@ def confirmar_delete():
 
 
 def deletar():
-    selecionados = [item_id for item_id, marcado in estado_das_checkboxes.items() if marcado] # Procura o item marcado na checkbox
+    selecionados = treeview.get_checked() # Procura o item marcado na checkbox
     
     if len(selecionados) == 0:
         mostrar_popup("Nenhum produto selecionado!")
@@ -206,6 +194,25 @@ def deletar():
     
     botao_confirmar = ttk.Button(popup, text="Confirmar", bootstyle=SUCCESS, command=confirmar_delete, padding=(20, 10))
     botao_confirmar.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+    
+    
+def usuario():
+    arquivo_login = open('usuario_logado.json', 'r', encoding='utf-8')
+    login = json.load(arquivo_login)
+    arquivo_login.close()
+    usuario_logado = login["nome"]
+    print("Usuário logado:", usuario_logado)
+    return usuario_logado
+    
+def cadastrar_funcionario():
+    root.destroy()
+    subprocess.run(["python", "cadastrar_funcionario.py"])
+    
+def administrador():
+    if usuario() == "Administrador":
+        botao_adm = ttk.Button(subframe, text="Cadastrar Funcionário", bootstyle=(DANGER,OUTLINE), width=30, command=cadastrar_funcionario)
+        botao_adm.grid(column=1, row=4, sticky=(S), pady=(10,0))
+    
 
 # Daqui para baixo é básico, a parte visível da coisa.
 # O que eu usei:
@@ -225,8 +232,10 @@ root.title("Página Principal")
 style = ttk.Style("darkly")
 root.resizable(False, False)
 
-imagem_checado = ImageTk.PhotoImage(Image.open("checado.png").resize((20, 20)))
-imagem_unchecado = ImageTk.PhotoImage(Image.open("unchecked.png").resize((20, 20)))
+variavel1 = tk.IntVar()
+variavel2 = tk.IntVar()
+UNCHECK = '☐' 
+CHECKED = '✅'
 
 
 subframe = ttk.Frame(root, padding=15, bootstyle="secondary", width=300)
@@ -249,7 +258,7 @@ botao_logout = ttk.Button(subframe, text="Deletar", bootstyle=(DANGER,OUTLINE), 
 botao_logout.grid(column=1, row=3, sticky=(W), pady=(10,0))
 
 botao_logout = ttk.Button(subframe, text="Logout", bootstyle=(DANGER,OUTLINE), width=30, command=voltar)
-botao_logout.grid(column=1, row=4, sticky=(S), pady=(300,0))
+botao_logout.grid(column=1, row=6, sticky=(S), pady=(300,0))
 
 
 entrada_busca = ttk.Entry(frame_busca, font=("Arial", 14))
@@ -258,9 +267,12 @@ entrada_busca.pack(side='left', fill='x', expand=True, padx=2)
 botao_buscar = ttk.Button(frame_busca, text="Buscar", bootstyle=INFO, command=mostrar_detalhes_do_produto)
 botao_buscar.pack(side='left', padx=5)
 
+administrador()
+
 
 columns = ("Nome", "Código", "Preço", "Quantidade", "Validade", "Fabricação", "Peso")
-treeview = ttk.Treeview(mainframe, columns=columns, show="tree headings", style="secondary")
+treeview = CheckboxTreeview(mainframe, columns=columns, show="tree headings")
+
 treeview.pack(fill='both', expand=True, padx=20, pady=20)
 
 # Definir as colunas
@@ -274,9 +286,9 @@ treeview.column("Quantidade", width=100, anchor="center")
 treeview.column("Validade", width=100, anchor="center")
 treeview.column("Fabricação", width=100, anchor="center")
 treeview.column("Peso", width=100, anchor="center")
-treeview.bind("<Button-1>", alternar_checkbox)
 tabela_produtos()
-treeview.column("#0", width=75, anchor="center")
-treeview.heading("#0", text="Selecionar")
+treeview.column("#0", width=80, anchor="center")
+treeview.heading("#0", text="Selecionar", anchor="center")
+
 
 root.mainloop()

@@ -4,7 +4,8 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import subprocess
-import json
+import json 
+
 
 def mostrar_popup(mensagem):
     popup = tk.Toplevel() 
@@ -32,20 +33,30 @@ def mainpage():
 def verificar_login():
     nome_de_usuario = entrada_de_usuario.get().strip()
     senha_do_usuario = entrada_de_senha.get().strip()
+    usuario_encontrado = False
     
     if not nome_de_usuario or not senha_do_usuario:
         mostrar_popup("Você não inseriu corretamente os dados!")
     else:
-       arquivo_funcionarios = open('funcionarios.json', 'r', encoding='utf-8')
-       funcionarios = json.load(arquivo_funcionarios)
-       for cpf, usuarios in funcionarios.items():
-           if usuarios["nome"].lower() == nome_de_usuario.lower() and usuarios["senha"].lower() == senha_do_usuario.lower():
-               root.destroy()
-               subprocess.run(["python", "mainpage.py"])
-           else:
-               mostrar_popup("Seu usuário não foi encontrado no sistema.")
-               
-
+        arquivo_funcionarios = open('funcionarios.json', 'r', encoding='utf-8')
+        funcionarios = json.load(arquivo_funcionarios)
+        for cpf, usuarios in funcionarios.items():
+            if usuarios["nome"].lower() == nome_de_usuario.lower() and usuarios["senha"].lower() == senha_do_usuario.lower():
+                dados_login = { "nome": nome_de_usuario }
+                arquivo_login = open('usuario_logado.json', 'r', encoding='utf-8')
+                login = json.load(arquivo_login)
+                arquivo_login.close()
+                login.update(dados_login)
+                arquivo = open('usuario_logado.json', 'w', encoding='utf-8')
+                json.dump(login, arquivo, indent=4, ensure_ascii=False)
+                arquivo.close()
+                usuario_encontrado = True
+                root.destroy()  
+                subprocess.run(["python", "mainpage.py"])
+                break
+        if not usuario_encontrado:
+            mostrar_popup("Seu usuário não foi encontrado no sistema.")
+            
 
 root = tk.Tk()
 root.title('Login de Usuário')
