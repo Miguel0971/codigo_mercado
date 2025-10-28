@@ -1,0 +1,12 @@
+{
+    "0000003123": {
+        "nome": "João Silva",
+        "senha": "0101",
+        "nome_completo": "João Silva Ribeiro"
+    },
+    "11111111111": {
+        "nome": "Administrador",
+        "senha": "12345678",
+        "nome_completo": "Administrador do Sistema"
+    }
+}
