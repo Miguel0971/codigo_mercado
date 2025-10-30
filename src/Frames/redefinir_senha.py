@@ -1,29 +1,21 @@
 import tkinter as tk
 import ttkbootstrap as ttk
-import subprocess
 from ttkbootstrap.constants import *
-from tkinter import *
+from ttkwidgets import CheckboxTreeview
+import sys, os
+import json
+import subprocess
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+from src.Class.Classes import Popup
+from src.Class.Classes import Produtos
+from src.Class.Classes import Usuario
+from src.Class.Classes import Pages
 
 root = tk.Tk()
 root.title("Redefinir Senha")
 style = ttk.Style("darkly")
 root.resizable(False, False)
-
-def mostrar_popup(mensagem):
-    popup = tk.Toplevel() 
-    popup.title("Mensagem")
-    popup.geometry("500x150")
-    popup.resizable(False, False)
-    
-    label = ttk.Label(popup, text=mensagem, font=("Arial", 14))
-    label.pack(padx=20, pady=20)
-
-    botao_fechar = ttk.Button(popup, text="Fechar", bootstyle=(SUCCESS,OUTLINE), padding=(40,20), command=popup.destroy)
-    botao_fechar.pack(pady=10)
-
-    # Não deixar usar a tela de cadastro enquanto tá com o popup ligado
-    popup.transient(root)  # Faz o pupop ficar em cima da tela de cadastro
-    popup.grab_set()  # Faz com que o foco permaneça na janela do popup
+popups = Popup(root, None, None)
 
 def botao_enviar():
   # if entrada_cpf.get() == "" or entrada_nome.get() == "" or entrada_senha.get() == "":

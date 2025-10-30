@@ -8,5 +8,10 @@
         "nome": "Administrador",
         "senha": "12345678",
         "nome_completo": "Administrador do Sistema"
+    },
+    "1234567": {
+        "nome": "Igor",
+        "senha": "12345",
+        "nome_completo": "Teste"
     }
 }
