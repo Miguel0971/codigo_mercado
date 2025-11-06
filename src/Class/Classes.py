@@ -6,6 +6,7 @@ import subprocess
 import sys
 import random
 import string
+import pyperclip
 class MainClass:
     def __init__(self):
         pass
@@ -390,9 +391,21 @@ class Usuario(Pages):
                 popups.mostrar_popup("Seu usuário não foi encontrado no sistema.")
                 
     def gerar_senha(self):
-        popups = Popup(None, self.root)
         tamanho = 12
         caracteres = string.ascii_letters + string.digits + string.punctuation
         senha = ''.join(random.choice(caracteres) for _ in range(tamanho))
-        popups.mostrar_popup(f"Sua nova senha aleatória é:\n{senha}")
+        self.popup = tk.Toplevel(self.root)
+        self.popup.title("Mensagem")
+        self.popup.geometry("500x250")
+        self.popup.resizable(False, False)
+
+        label = ttk.Label(self.popup, text=f"Sua nova senha aleatória é:\n{senha}  \n\nO texto foi copiado para a área de transferência.", font=("Arial", 14))
+        label.pack(padx=20, pady=20)
+        pyperclip.copy(senha)
+
+        botao_fechar = ttk.Button(self.popup, text="Fechar", bootstyle=(SUCCESS,OUTLINE), padding=(40,20), command=self.popup.destroy)
+        botao_fechar.pack(pady=10)
+
+        self.popup.transient(self.root)
+        self.popup.grab_set()
         return senha
