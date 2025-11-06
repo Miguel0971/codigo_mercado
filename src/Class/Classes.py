@@ -3,10 +3,9 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import json
 import subprocess
-from PIL import Image, ImageTk
-from ttkwidgets import CheckboxTreeview
-import sys, os
-
+import sys
+import random
+import string
 class MainClass:
     def __init__(self):
         pass
@@ -35,11 +34,12 @@ class Popup:
         
         
 class Produtos:
-    def __init__(self, treeview, estado_das_checkboxes, entrada_busca, root):
+    def __init__(self, treeview, estado_das_checkboxes, entrada_busca, root, popup):
         self.treeview = treeview
         self.estado = estado_das_checkboxes
         self.entrada_busca = entrada_busca
         self.root = root
+        self.popup = popup
         
         
     def carregar_produtos(self):
@@ -49,14 +49,16 @@ class Produtos:
         return produtos
     
     def codigo(self):
-        codigo = None
+        self.codigo = None
         if len(sys.argv) > 1:
-            codigo = sys.argv[1].zfill(5)
-            print("Código recebido:", codigo)
+            self.codigo = sys.argv[1]
+            print("Código recebido:", self.codigo)
+        else:
+            self.codigo = None
         
     
     def carregar_dados(self, entradas):
-        popups = Popup()
+        popups = Popup(self.popup, self.root)
         try:
             with open('./src/List/produtos.json', 'r', encoding='utf-8') as f:
                 produtos = json.load(f)
@@ -75,7 +77,7 @@ class Produtos:
             popups.mostrar_popup(f"Erro ao carregar dados: {str(e)}")
     
     def alterar(self, entradas):
-        popups = Popup()
+        popups = Popup(self.popup, self.root)
         nome = entradas["Nome"].get()
         preco = entradas["Preço"].get()
         quantidade = entradas["Quant"].get()
@@ -172,9 +174,10 @@ class Produtos:
         selecionados = self.treeview.get_checked()
         item_selecionado = selecionados[0]
         codigo_produto = self.treeview.item(item_selecionado)['values'][1]  
-    
-        produtos = Produtos()
-        produtos.carregar_produtos()
+
+        produtos_objeto = Produtos(self.treeview, None, self.entrada_busca, self.root, None)
+        produtos = produtos_objeto.carregar_produtos()  
+
 
 
         codigo_str = str(codigo_produto)
@@ -189,7 +192,7 @@ class Produtos:
             del produtos_corrigidos[codigo_str]
             with open('./src/List/produtos.json', 'w', encoding='utf-8') as arquivo_produtos:
                 json.dump(produtos_corrigidos, arquivo_produtos, ensure_ascii=False, indent=4)
-            tabela = Produtos()
+            tabela = Produtos(self.treeview, None, self.entrada_busca, self.root, None)
             tabela.tabela_produtos()
             popup_delete = Popup(None, self.root)
             popup_delete.mostrar_popup("Produto deletado com sucesso!")
@@ -199,8 +202,9 @@ class Produtos:
             
     def mostrar_detalhes_do_produto(self):
         busca = self.entrada_busca.get().lower()
-        produtos = Produtos()
-        produtos.carregar_produtos()
+        produtos_objeto = Produtos(self.treeview, None, self.entrada_busca, self.root, None)
+        produtos = produtos_objeto.carregar_produtos()  
+
     
         for id, produto in produtos.items():
             if busca in produto['nome'].lower():
@@ -243,7 +247,7 @@ class Produtos:
         popup_nenhum.mostrar_popup("Nenhum produto foi encontrado!")
         
     def cadastrar(self, entradas):
-            popups = Popup()
+            popups = Popup(self.popup, self.root)
             nome = entradas["Nome"].get()
             codigo = entradas["Código"].get()
             preco = entradas["Preço"].get()
@@ -285,10 +289,40 @@ class Pages:
         
         
 class Usuario(Pages):
-    def __init__(self, root, subframe, entradas):
+    def __init__(self, root, subframe, entradas, popup):
         self.root = root
         self.subframe = subframe
         self.entradas = entradas
+        self.popup = popup
+
+
+    def redefinir_senha(self, entradas):
+        popups = Popup(self.popup, self.root)
+        cpf = entradas["Insira seu CPF"].get().strip()
+        nome = entradas["Insira seu nome completo"].get().strip()
+        senha = entradas["Insira sua nova senha"].get().strip()
+
+
+        try:
+            with open('./src/List/funcionarios.json', 'r', encoding='utf-8') as f:
+                funcionarios = json.load(f)
+
+            if cpf in funcionarios:
+                funcionario = funcionarios[cpf]
+            
+                if funcionario.get("nome_completo") == nome:
+                    funcionario["senha"] = senha  
+
+                    with open('./src/List/funcionarios.json', 'w', encoding='utf-8') as f:
+                        json.dump(funcionarios, f, indent=4, ensure_ascii=False)
+
+                    popups.mostrar_popup("Senha alterada com sucesso!")
+                else:
+                    popups.mostrar_popup("Nome incorreto para este CPF!")
+            else:
+                popups.mostrar_popup("Funcionário não encontrado para alterar!")
+        except Exception as e:
+            popups.mostrar_popup(f"Erro ao alterar funcionário: {str(e)}")
         
     def cadastrar(self):
         popups = Popup(None, self.root)
@@ -355,5 +389,10 @@ class Usuario(Pages):
             if not usuario_encontrado:
                 popups.mostrar_popup("Seu usuário não foi encontrado no sistema.")
                 
-    def gerar_senha():
-            pass 
+    def gerar_senha(self):
+        popups = Popup(None, self.root)
+        tamanho = 12
+        caracteres = string.ascii_letters + string.digits + string.punctuation
+        senha = ''.join(random.choice(caracteres) for _ in range(tamanho))
+        popups.mostrar_popup(f"Sua nova senha aleatória é:\n{senha}")
+        return senha

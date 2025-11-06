@@ -16,7 +16,7 @@ root.resizable(False, False)
 mainframe = ttk.Frame(root, padding=20)
 mainframe.grid(row=0, column=0, sticky=(N, E, W, S))
 
-produtos = Produtos(root, None)
+produtos = Produtos(None, None, None, root, None)
 paginas = Pages(root, None)
 
 labels_usadas = ["Nome", "Preço", "Quant", "VAL", "FAB", "Peso"]
@@ -33,9 +33,12 @@ for contador, label in enumerate(labels_usadas):
 botao_voltar = ttk.Button(mainframe, text="Voltar", bootstyle=(DANGER, OUTLINE), padding=(40, 20), command=lambda: paginas.passar_pagina("./src/Frames/programa.py"))
 botao_voltar.grid(row=8, column=0, pady=(30, 10), padx=(10, 10), sticky=W)
 
-botao_alterar = ttk.Button(mainframe, text="Alterar", bootstyle=(SUCCESS, OUTLINE), padding=(40, 20), command=produtos.alterar(entradas))
+botao_alterar = ttk.Button(mainframe, text="Alterar", bootstyle=(SUCCESS, OUTLINE), padding=(40, 20), command=lambda: produtos.alterar(entradas))
 botao_alterar.grid(row=8, column=1, pady=(30, 10), padx=(10, 10), sticky=E)
 
-produtos.carregar_dados()  # preenche as entradas com os dados atuais
+produtos.codigo()
+produtos.carregar_dados(entradas)
+  # preenche as entradas com os dados atuais
+
 
 root.mainloop()

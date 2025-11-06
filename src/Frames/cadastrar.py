@@ -17,7 +17,7 @@ mainframe.grid(row=0, column=0, sticky=(N, E, W, S))
 labels_usadas = ["Nome", "Código", "Preço", "Quant", "VAL", "FAB", "Peso"]
 entradas = {}
 paginas = Pages(root, None)
-produtos = Produtos(None, None, None, root)
+produtos = Produtos(None, None, None, root, None)
 
 for contador, label in enumerate(labels_usadas):
     label_criada = tk.Label(mainframe, text=f"{label}: ", relief="solid", bd=2, padx=10, pady=5, width=6, font=("Arial",22))
@@ -30,7 +30,7 @@ for contador, label in enumerate(labels_usadas):
 botao_voltar = ttk.Button(mainframe, text="Voltar", bootstyle=(DANGER,OUTLINE), padding=(40,20), command=lambda: paginas.passar_pagina("./src/Frames/mainpage.py"))
 botao_voltar.grid(row=8, column=0, pady=(30, 10), padx=(10,10), sticky=W)
 
-botao_cadastrar = ttk.Button(mainframe, text="Cadastrar", bootstyle=(SUCCESS,OUTLINE), padding=(40,20), command=produtos.cadastrar(entradas))
+botao_cadastrar = ttk.Button(mainframe, text="Cadastrar", bootstyle=(SUCCESS,OUTLINE), padding=(40,20), command=lambda: produtos.cadastrar(entradas))
 botao_cadastrar.grid(row=8, column=0, pady=(30,10), padx=(10,10), sticky=E)
 
 root.mainloop()

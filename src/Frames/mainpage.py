@@ -33,9 +33,9 @@ entrada_busca = ttk.Entry(frame_busca, font=("Arial", 14))
 entrada_busca.pack(side='left', fill='x', expand=True, padx=2)
 
 
-tabela = Produtos(treeview, estado_das_checkboxes, entrada_busca, root)
+tabela = Produtos(treeview, estado_das_checkboxes, entrada_busca, root, None)
 paginas = Pages(root, None)
-usuario = Usuario(root, subframe)
+usuario = Usuario(root, subframe, None, None)
 
 
 botao_cadastro = ttk.Button(subframe, text="Cadastrar produto", bootstyle=(SUCCESS, OUTLINE), width=30, command=lambda: paginas.passar_pagina("./src/Frames/cadastrar.py"))
@@ -44,7 +44,7 @@ botao_cadastro.grid(column=1, row=1, sticky=(W), pady=(10,0))
 botao_alterar = ttk.Button(subframe, text="Alterar produto", bootstyle=(SUCCESS,OUTLINE), width=30, command=tabela.alterar_produto)
 botao_alterar.grid(column=1, row=2, sticky=(W), pady=(10,0))
 
-botao_delete = ttk.Button(subframe, text="Deletar", bootstyle=(DANGER,OUTLINE), width=30, command=tabela.deletar)
+botao_delete = ttk.Button(subframe, text="Deletar", bootstyle=(DANGER,OUTLINE), width=30, command=lambda:tabela.deletar())
 botao_delete.grid(column=1, row=3, sticky=(W), pady=(10,0))
 
 botao_logout = ttk.Button(subframe, text="Logout", bootstyle=(DANGER,OUTLINE), width=30, command=lambda: paginas.passar_pagina("./src/Frames/programa.py"))
